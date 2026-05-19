@@ -1,0 +1,35 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        run: pip install openpyxl pillow pyinstaller
+
+      - name: Build EXE
+        shell: bash
+        run: |
+          pyinstaller --onefile --windowed \
+            --add-data "static;static" \
+            --name "直播投放数据处理工具" \
+            --clean \
+            web_app.py
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-ad-data-tool-exe
+          path: dist/*.exe
